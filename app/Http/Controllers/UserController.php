@@ -32,11 +32,37 @@ class UserController extends Controller
                 'name' => 'required|string|min:2|max:125',
                 'email' => 'required|string|min:10|max:125|email|unique:users',
                 'password' => 'required|string|min:2',
-            ]);
+            ],
+            [
+                'name.required' => 'O Nome é obrigatório',
+                'name.min' => 'O nome deve ter no mínimo :min caracteres',
+                'name.max' => 'O nome deve ter no mínimo :max caracteres',
+                'name.string' => 'O nome deve ser do tipo string',
+                'email.required' => 'O E-mail é obrigatório',
+                'email.min' => 'O e-mail deve ter no mínimo :min caracteres',
+                'email.max' => 'O e-mail deve ter no máximo :max caracteres',
+                'email.email' => 'O e-mail deve ser um endereço de e-mail válido',
+                'email.unique' => 'O e-mail fornecido já está sendo usado',
+                'password.required' => 'A senha é obrigatória',
+                'password.min' => 'A senha deve ter no mínimo :min caracteres',
+                'password.string' => 'A senha deve ser do tipo string',
+            ]
+        );
+            
         
-            if ($validator->fails()) {
-                return response()->json(['message' => 'As credenciais informadas não correspondem ao modelo correto da requisição. Por favor verifique os dados informados e tente novamente.'], 400);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+        
+            if ($errors->has('email') && $errors->first('email') === 'O e-mail fornecido já está sendo usado') {
+                return response()->json([
+                    'message' => $errors->first('email')
+                ], 422);
+            } else {
+                return response()->json([
+                    'message' => $errors->first()
+                ], 400);
             }
+        }
 
             $data = $request->validate([
                 'name' => 'required|string|min:2|max:125',
@@ -88,8 +114,13 @@ class UserController extends Controller
         //
     }
 
-    public function logout(Request $request, string $id){
+    public function logout(Request $request){
         try {
+            $id = $request->input('id');
+            if (empty($id)) {
+                return response()->json(['message' => 'ID não fornecido.'], 400);
+            }
+
             // Busca o usuário pelo ID
             $user = User::findOrFail($id);
             $token = JWTAuth::fromUser($user);
@@ -109,7 +140,7 @@ class UserController extends Controller
     
         } catch (JWTException $e) {
             // Retorna uma mensagem de erro genérico caso o erro seja outro
-            return response()->json(['message' => 'Erro ao tentar encontrar o usuário no servidor'], 500);
+            return response()->json(['message' => "Erro ao tentar encontrar o usuário no servidor"], 500);
         }
     }
 }

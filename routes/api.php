@@ -21,10 +21,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group(['middleware'=>['apiJwt']], function(){
-    Route::get('userson', [UserController::class, 'index']);
+    Route::post('logout', [UserController::class, 'logout']);
 });
 Route::post('login', [AuthController::class, 'login']);
-Route::get('logout/{id}', [UserController::class, 'logout']);
 Route::post('users', [UserController::class, 'store']);
 Route::get('users/{id}', [UserController::class, 'show']); // Solicita os dados do usuário que possui o ID informado para editar - desenvolver
 Route::put('users/{id}', [UserController::class, 'update']); // Realiza a atualização do cadastro no sistema - desenvolver

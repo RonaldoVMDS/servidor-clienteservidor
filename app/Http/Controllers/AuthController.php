@@ -32,6 +32,12 @@ class AuthController extends Controller
             $username = $user->name;
             $email = $user->email;
 
+            // Criar um payload personalizado com o ID do usuário
+            $customPayload = ['user_id' => $id];
+
+            // Gerar o token JWT com o payload personalizado
+            $token = JWTAuth::fromUser($user, $customPayload);
+
             return response()->json([
                 'id' => $id,
                 'name' => $username,
