@@ -28,17 +28,17 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Essas credenciais não correspondem aos nossos registros.'], 401);
             }
             $user = auth()->user();
-            $id = $user->id;
+            $id = intval($user->id);
             $username = $user->name;
             $email = $user->email;
 
             // Criar um payload personalizado com o ID do usuário
-            $customPayload = ['user_id' => $id];
+            $customPayload = ['id' => $id];
 
             // Gerar o token JWT com o payload personalizado
             $token = JWTAuth::fromUser($user, $customPayload);
 
-            return response()->json([
+            return response()->json([   
                 'id' => $id,
                 'name' => $username,
                 'email' => $email,

@@ -116,31 +116,40 @@ class UserController extends Controller
 
     public function logout(Request $request){
         try {
-            $id = $request->input('id');
-            if (empty($id)) {
-                return response()->json(['message' => 'ID não fornecido.'], 400);
-            }
-
-            // Busca o usuário pelo ID
-            $user = User::findOrFail($id);
-            $token = JWTAuth::fromUser($user);
-
-            // Verifique se o token é válido
-            if (JWTAuth::parseToken($token)->check()){
-                // Revoga o token JWT do usuário
-                JWTAuth::invalidate(JWTAuth::getToken());
-        
-                // Retorna uma mensagem de sucesso
-                return response()->json(['message' => 'Logout realizado com sucesso!'], 200);
-            }
-            else{
-                // Retorna mensagem de erro caso não encontre o id no sistema
-                return response()->json(['message' => 'Essas credenciais não correspondem aos nossos registros.'], 401);
+            $token = $request->bearerToken(); // Obtém o token do cabeçalho de autenticação
+    
+            if (!$token) {
+                return response()->json(['message' => 'Token não fornecido.'], 401);
             }
     
+            $payload = JWTAuth::parseToken()->getPayload();
+            $userId = $payload->get('sub'); // Obtém o ID do usuário do token
+            $id = $request->input('id');
+            if ($userId == $id) {
+                // Busca o usuário pelo ID
+                $user = User::findOrFail($userId);
+    
+                // Verifique se o token é válido
+                if (JWTAuth::parseToken($token)->check()){
+                    // Revoga o token JWT do usuário
+                    JWTAuth::invalidate(JWTAuth::getToken());
+            
+                    // Retorna uma mensagem de sucesso
+                    return response()->json(['message' => 'Logout realizado com sucesso!'], 200);
+                }
+                else {
+                    // Retorna mensagem de erro caso o token seja inválido
+                    return response()->json(['message' => 'Token inválido.'], 401);
+                }
+            }
+            else {
+                // Retorna mensagem de erro caso não encontre o ID do usuário no token
+                return response()->json(['message' => 'ID do usuário não encontrado no token.'], 401);
+            }
         } catch (JWTException $e) {
-            // Retorna uma mensagem de erro genérico caso o erro seja outro
-            return response()->json(['message' => "Erro ao tentar encontrar o usuário no servidor"], 500);
+            // Retorna uma mensagem de erro genérico caso ocorra uma exceção
+            return response()->json(['message' => 'Erro ao processar o token.'], 500);
         }
     }
+    
 }
