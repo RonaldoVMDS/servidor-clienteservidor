@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,12 +22,16 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::group(['middleware'=>['apiJwt']], function(){
+Route::group(['middleware' => ['apiJwt']], function () {
+    Route::get('users/{id}', [UserController::class, 'show']);
+    Route::put('users/{id}', [UserController::class, 'update']);
+    Route::delete('users/{id}', [UserController::class, 'destroy']); // Verificar problemas com foreign key
+    Route::post('/occurrences', [OccurrenceController::class, 'createOccurrence']);
+    Route::get('occurrences/{id}', [OccurrenceController::class, 'getUserOccurrences']);
+    Route::put('occurrences/{occurrenceId}', [OccurrenceController::class, 'updateOccurrence']);
     Route::post('logout', [UserController::class, 'logout']);
 });
+Route::get('/occurrences', [OccurrenceController::class, 'getAllOccurrences']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('users', [UserController::class, 'store']);
-Route::get('users/{id}', [UserController::class, 'show']); // Solicita os dados do usuário que possui o ID informado para editar - desenvolver
-Route::put('users/{id}', [UserController::class, 'update']); // Realiza a atualização do cadastro no sistema - desenvolver
-Route::delete('users/{id}', [UserController::class, 'destroy']); // Deleta o cadastro do sistema - desenvolver
 // falta desenvolver também toda a tela de ocorrências
