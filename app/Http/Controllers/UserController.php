@@ -145,7 +145,7 @@ class UserController extends Controller
                         'email',
                         Rule::unique('users')->ignore($idRequest),
                     ],
-                    'password' => 'required|string|min:2',
+                    'password' => 'string|min:2',
                 ],
                 [
                     'name.required' => 'O Nome é obrigatório',
@@ -181,13 +181,7 @@ class UserController extends Controller
             $data = $request->validate([
                 'name' => 'required|string|min:2|max:125',
                 'email' => 'required|string|min:10|max:125',
-                'password' => 'required|string|min:2',
             ]);
-            if (isset($data['password'])) {
-                $data['password'] = bcrypt($data['password']); // Encripta a senha apenas se fornecida
-            } else {
-                unset($data['password']); // Remove a chave 'password' do array se não fornecida
-            }
             $token = $request->bearerToken(); // Obtém o token do cabeçalho de autenticação
 
             if (!$token) {
@@ -205,7 +199,11 @@ class UserController extends Controller
                     if (!$user) {
                         return response()->json(['message' => 'Usuário não encontrado.'], 404);
                     }
-                    $data['password'] = bcrypt($request->password); // Encripta a senha
+                    if (isset($data['password'])) {
+                        $data['password'] = bcrypt($data['password']); // Encripta a senha apenas se fornecida
+                    } else {
+                        unset($data['password']); // Remove a chave 'password' do array se não fornecida
+                    }
                     $user->update($data);
                     return response()->json([
                         'id' => $user->id,

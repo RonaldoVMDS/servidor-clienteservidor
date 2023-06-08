@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('occurrences', function (Blueprint $table) {
             $table->id();
-            $table->timestamp('registered_at');
+            $table->string('registered_at');
             $table->string('local');
             $table->integer('occurrence_type');
             $table->integer('km');

@@ -67,24 +67,25 @@ class OccurrenceController extends Controller
                 [
                     'registered_at' => [
                         'required',
-                        'date_format:Y-m-d H:i:s',
+                        'date_format:Y-m-d\TH:i:s.v\Z',
                         function ($attribute, $value, $fail) {
-                            $now = Carbon::now();
-                            $inputDate = Carbon::createFromFormat('Y-m-d H:i:s', $value);
-
+                            $now = Carbon::now('UTC');
+                            $inputDate = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $value, 'UTC');
+                    
                             if ($inputDate->greaterThan($now)) {
                                 $fail('A data de registro não pode ser uma data futura.');
                             }
                         },
                     ],
-                    'local' => 'required|string|min:10|max:125',
+                                                        
+                    'local' => 'required|string|min:2|max:125',
                     'occurrence_type' => 'required|integer|between:1,10',
                     'km' => 'required|integer|between:1,9999',
                     'user_id' => 'required|integer',
                 ],
                 [
                     'registered_at.required' => 'A data de registro é obrigatória.',
-                    'registered_at.date_format' => 'O formato da data de registro deve ser YYYY-MM-DD HH:mm:ss.',
+                    'registered_at.date_format' => 'O formato da data de registro deve ser ISO.',
                     'local.required' => 'O local é obrigatório.',
                     'local.string' => 'O local deve ser uma string.',
                     'local.min' => 'Favor preencher com ao menos :min caracteres.',
@@ -149,10 +150,10 @@ class OccurrenceController extends Controller
                 [
                     'registered_at' => [
                         'required',
-                        'date_format:Y-m-d H:i:s',
+                        'date_format:Y-m-d\TH:i:s.u\Z',
                         function ($attribute, $value, $fail) {
                             $now = Carbon::now();
-                            $inputDate = Carbon::createFromFormat('Y-m-d H:i:s', $value);
+                            $inputDate = Carbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value);
 
                             if ($inputDate->greaterThan($now)) {
                                 $fail('A data de registro não pode ser uma data futura.');
