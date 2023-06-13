@@ -78,7 +78,7 @@ class OccurrenceController extends Controller
                         },
                     ],
                                                         
-                    'local' => 'required|string|min:2|max:125',
+                    'local' => 'required|string|min:1|max:125',
                     'occurrence_type' => 'required|integer|between:1,10',
                     'km' => 'required|integer|between:1,9999',
                     'user_id' => 'required|integer',
