@@ -145,7 +145,6 @@ class UserController extends Controller
                         'email',
                         Rule::unique('users')->ignore($idRequest),
                     ],
-                    'password' => 'string|min:2',
                 ],
                 [
                     'name.required' => 'O Nome é obrigatório',
@@ -157,9 +156,6 @@ class UserController extends Controller
                     'email.max' => 'O e-mail deve ter no máximo :max caracteres',
                     'email.email' => 'O e-mail deve ser um endereço de e-mail válido',
                     'email.unique' => 'O e-mail fornecido já está sendo usado',
-                    'password.required' => 'A senha é obrigatória',
-                    'password.min' => 'A senha deve ter no mínimo :min caracteres',
-                    'password.string' => 'A senha deve ser do tipo string',
                 ]
             );
 
