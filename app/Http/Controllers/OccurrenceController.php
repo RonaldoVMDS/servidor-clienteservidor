@@ -150,24 +150,25 @@ class OccurrenceController extends Controller
                 [
                     'registered_at' => [
                         'required',
-                        'date_format:Y-m-d\TH:i:s.u\Z',
+                        'date_format:Y-m-d\TH:i:s.v\Z',
                         function ($attribute, $value, $fail) {
-                            $now = Carbon::now();
-                            $inputDate = Carbon::createFromFormat('Y-m-d\TH:i:s.u\Z', $value);
-
+                            $now = Carbon::now('UTC');
+                            $inputDate = Carbon::createFromFormat('Y-m-d\TH:i:s.v\Z', $value, 'UTC');
+                    
                             if ($inputDate->greaterThan($now)) {
                                 $fail('A data de registro não pode ser uma data futura.');
                             }
                         },
                     ],
-                    'local' => 'required|string|min:10|max:125',
+                                                        
+                    'local' => 'required|string|min:1|max:125',
                     'occurrence_type' => 'required|integer|between:1,10',
                     'km' => 'required|integer|between:1,9999',
                     'user_id' => 'required|integer',
                 ],
                 [
                     'registered_at.required' => 'A data de registro é obrigatória.',
-                    'registered_at.date_format' => 'O formato da data de registro deve ser YYYY-MM-DD HH:mm:ss.',
+                    'registered_at.date_format' => 'O formato da data de registro deve ser ISO.',
                     'local.required' => 'O local é obrigatório.',
                     'local.string' => 'O local deve ser uma string.',
                     'local.min' => 'Favor preencher com ao menos :min caracteres.',
@@ -228,4 +229,42 @@ class OccurrenceController extends Controller
             return response()->json(['message' => "Erro no servidor: $e"], 500);
         }
     }
+    public function deleteOccurrence(Request $request, string $ocrId)
+{
+    try {
+        $token = $request->bearerToken(); // Obtém o token do cabeçalho de autenticação
+
+        if (!$token) {
+            return response()->json(['message' => 'Token não fornecido.'], 401);
+        }
+
+        $payload = JWTAuth::parseToken()->getPayload();
+        $userId = $payload->get('sub'); // Obtém o ID do usuário do token
+
+        if (JWTAuth::parseToken($token)->check()) {
+            $occurrence = Occurrence::findOrFail($ocrId);
+
+            // Verificar se a ocorrência existe
+            if (!$occurrence) {
+                return response()->json(['message' => 'Ocorrência não encontrada.'], 404);
+            }
+
+            // Verificar se o usuário é dono da ocorrência
+            if ($occurrence->user_id != $userId) {
+                return response()->json(['message' => 'Você não tem permissão para excluir esta ocorrência.'], 403);
+            }
+
+            $occurrence->delete();
+
+            return response()->json(['message' => 'Ocorrência excluída com sucesso.'], 200);
+        } else {
+            // Retorna mensagem de erro caso o token seja inválido
+            return response()->json(['message' => 'Token inválido.'], 401);
+        }
+    } catch (JWTException $e) {
+        // Retorna uma mensagem de erro genérico caso ocorra uma exceção
+        return response()->json(['message' => "Erro no servidor: $e"], 500);
+    }
+}
+
 }

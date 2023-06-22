@@ -27,8 +27,9 @@ Route::group(['middleware' => ['apiJwt']], function () {
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::delete('users/{id}', [UserController::class, 'destroy']); // Verificar problemas com foreign key
     Route::post('/occurrences', [OccurrenceController::class, 'createOccurrence']);
-    Route::get('occurrences/{id}', [OccurrenceController::class, 'getUserOccurrences']);
+    Route::get('occurrences/users/{id}', [OccurrenceController::class, 'getUserOccurrences']);
     Route::put('occurrences/{occurrenceId}', [OccurrenceController::class, 'updateOccurrence']);
+    Route::delete('occurrences/{occurrenceId}', [OccurrenceController::class, 'deleteOccurrence']);
     Route::post('logout', [UserController::class, 'logout']);
 });
 Route::get('/occurrences', [OccurrenceController::class, 'getAllOccurrences']);
