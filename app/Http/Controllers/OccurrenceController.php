@@ -44,7 +44,7 @@ class OccurrenceController extends Controller
                     // Buscar as ocorrências do usuário
                     $occurrences = Occurrence::where('user_id', $id)->get();
 
-                    return response()->json(['occurrences' => $occurrences], 200);
+                    return response()->json($occurrences, 200);
                 } else {
                     // Retorna mensagem de erro caso o token seja inválido
                     return response()->json(['message' => 'Token inválido.'], 401);

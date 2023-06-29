@@ -177,6 +177,7 @@ class UserController extends Controller
             $data = $request->validate([
                 'name' => 'required|string|min:2|max:125',
                 'email' => 'required|string|min:10|max:125',
+                'password' => 'nullable|string|min:6|max:255',
             ]);
             $token = $request->bearerToken(); // Obtém o token do cabeçalho de autenticação
 
